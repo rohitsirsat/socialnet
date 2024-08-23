@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import morganMiddleware from "./logger/morgan.logger.js";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -31,5 +32,6 @@ app.use(express.static("public"));
 
 // to set and get access of cookies from user's browser
 app.use(cookieParser());
+app.use(morganMiddleware);
 
 export { app };
