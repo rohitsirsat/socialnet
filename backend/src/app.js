@@ -34,4 +34,9 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morganMiddleware);
 
+// import routes
+import { userRouter } from "./controllers/user.controllers.js";
+
+app.use("/api/v1/users", userRouter);
+
 export { app };
