@@ -1,7 +1,6 @@
 import { validationResult } from "express-validator";
 import { ApiError } from "../utils/ApiError.js";
-import { errorHandler } from "../utils/";
-
+import { errorHandler } from "../middlewares/error.middlewares.js";
 /**
  *
  * @param {import("express").Request} req

@@ -35,7 +35,7 @@ app.use(cookieParser());
 app.use(morganMiddleware);
 
 // import routes
-import { userRouter } from "./controllers/user.controllers.js";
+import userRouter from "./routes/user.routes.js";
 
 app.use("/api/v1/users", userRouter);
 
