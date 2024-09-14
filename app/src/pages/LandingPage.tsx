@@ -1,41 +1,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
 import Footer from "@/components/Footer/Footer";
 import { ModeToggle } from "@/Theme/ModeToggle";
 
 export default function LandingPage() {
-  // const [theme, setTheme] = useState("light");
-
-  // useEffect(() => {
-  //   const savedTheme = localStorage.getItem("theme") || "light";
-  //   setTheme(savedTheme);
-  //   document.documentElement.classList.toggle("dark", savedTheme === "dark");
-  // }, []);
-
-  // const toggleTheme = () => {
-  //   const newTheme = theme === "light" ? "dark" : "light";
-  //   setTheme(newTheme);
-  //   localStorage.setItem("theme", newTheme);
-  //   document.documentElement.classList.toggle("dark", newTheme === "dark");
-  // };
-
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <ParticleBackground />
       <main className="flex-grow flex flex-col items-center justify-center p-8 relative">
-        {/* <Button
-          onClick={() => setTheme("light")}
-          variant="outline"
-          size="icon"
-          className="absolute top-4 right-4"
-        >
-          {theme === "light" ? (
-            <Sun className="h-[1.2rem] w-[1.2rem]" />
-          ) : (
-            <Moon className="h-[1.2rem] w-[1.2rem]" />
-          )}
-        </Button> */}
         <div className="absolute top-4 right-4">
           <ModeToggle />
         </div>
@@ -56,6 +28,7 @@ export default function LandingPage() {
             Your new favorite social media platform
           </p>
         </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -69,6 +42,7 @@ export default function LandingPage() {
             <Button>Sign In</Button>
           </div>
         </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,10 +78,20 @@ type FeatureCardProps = {
 
 function FeatureCard({ title, description }: FeatureCardProps) {
   return (
-    <div className="p-6 rounded-lg bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm">
+    <motion.div
+      className="p-6 rounded-lg bg-white/80 dark:bg-gray-800/80 shadow-lg backdrop-blur-sm"
+      whileHover={{
+        scale: 1.05, // Increase size on hover
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+      }}
+    >
       <h4 className="text-xl font-semibold mb-2">{title}</h4>
       <p className="text-muted-foreground">{description}</p>
-    </div>
+    </motion.div>
   );
 }
 
