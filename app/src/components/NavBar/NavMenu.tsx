@@ -18,7 +18,7 @@ const NavMenu = () => {
       {/* Sidebar (hidden on mobile) */}
       <div className="hidden md:block md:col-span-1 lg:col-span-1">
         <div className=" sticky top-0 p-4">
-          <nav className="space-y-4 ">
+          <nav className="space-y-4 ml-28">
             <Link to="home">
               <h1 className="text-3xl font-bold text-primary ml-4">
                 SocialNet
@@ -42,13 +42,15 @@ const NavMenu = () => {
               <Search className="mr-2 h-8 w-8" />
               Explore
             </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-foreground"
-            >
-              <Mail className="mr-2 h-8 w-8" />
-              Messages
-            </Button>
+            <Link to="messages">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-foreground"
+              >
+                <Mail className="mr-2 h-8 w-8" />
+                Messages
+              </Button>
+            </Link>
 
             <Link to="/profile">
               <Button

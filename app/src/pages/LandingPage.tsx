@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer/Footer";
 import { ModeToggle } from "@/Theme/ModeToggle";
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -35,11 +36,13 @@ export default function LandingPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col items-center gap-1">
             <h4 className="text-2xl font-semibold mb-8 text-center">
               Already have an account...?
             </h4>
-            <Button>Sign In</Button>
+            <Link to="sign-up">
+              <Button>Sign up</Button>
+            </Link>
           </div>
         </motion.div>
 
