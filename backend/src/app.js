@@ -36,7 +36,20 @@ app.use(morganMiddleware);
 
 // import routes
 import userRouter from "./routes/user.routes.js";
+import socialBookmarkRouter from "./routes/bookmark.routes.js";
+import socialCommentRouter from "./routes/comment.routes.js";
+import socialFollowRouter from "./routes/follow.routes.js";
+import socialLikeRouter from "./routes/like.routes.js";
+import socialPostRouter from "./routes/post.routes.js";
+import socialProfileRouter from "./routes/profile.routes.js";
 
 app.use("/api/v1/users", userRouter);
+
+app.use("/api/v1/social-media/profile", socialProfileRouter);
+app.use("/api/v1/social-media/follow", socialFollowRouter);
+app.use("/api/v1/social-media/posts", socialPostRouter);
+app.use("/api/v1/social-media/like", socialLikeRouter);
+app.use("/api/v1/social-media/bookmarks", socialBookmarkRouter);
+app.use("/api/v1/social-media/comments", socialCommentRouter);
 
 export { app };
