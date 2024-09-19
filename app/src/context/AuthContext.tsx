@@ -40,15 +40,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const navigate = useNavigate();
 
-  // Register user
-  const register = async (data: {
-    username: string;
-    email: string;
-    password: string;
-  }) => {
+  // Login user
+  const login = async (data: { username: string; password: string }) => {
     await requestHandler(
-      async () => registerUser(data),
+      async () => await loginUser(data),
       setIsLoading,
+
       (res) => {
         const { data } = res;
         setUser(data.user);
@@ -61,32 +58,36 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
           <AlertTitle>{error}</AlertTitle>
-          <AlertDescription>Sign up failed. Please try again</AlertDescription>
+          <AlertDescription>Login up failed. Please try again</AlertDescription>
         </Alert>;
       }
     );
   };
 
-  // Login user
-  const login = async (data: { username: string; password: string }) => {
+  // Register user
+  const register = async (data: {
+    username: string;
+    email: string;
+    password: string;
+  }) => {
     await requestHandler(
-      async () => await loginUser(data),
+      async () => registerUser(data),
       setIsLoading,
       () => {
         <Alert>
           <RocketIcon className="h-4 w-4" />
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription>
-            Login successfully! Go ahead and login
+            Register successfully! Go ahead and Sign In
           </AlertDescription>
         </Alert>;
-        navigate("/home");
+        navigate("/sign-in");
       },
       (error) => {
         <Alert variant="destructive">
           <ExclamationTriangleIcon className="h-4 w-4" />
           <AlertTitle>{error}</AlertTitle>
-          <AlertDescription>Login up failed. Please try again</AlertDescription>
+          <AlertDescription>Sign up failed. Please try again</AlertDescription>
         </Alert>;
       }
     );
@@ -101,7 +102,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setToken(null);
         LocalStorage.clear();
 
-        navigate("/login");
+        navigate("/sign-in");
       },
       (error) => {
         <Alert variant="destructive">

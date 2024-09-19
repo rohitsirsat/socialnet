@@ -29,7 +29,7 @@ const Signup = () => {
         <div className="flex flex-col items-center gap-y-4">
           <LockKeyhole className="h-8 w-8 mr-2" />
           <h1 className="inline-flex items-center text-xl font-semibold mb-6 text-center">
-            Sign Up
+            Sign In
           </h1>
         </div>
 
@@ -62,8 +62,8 @@ const Signup = () => {
         {/* Link to Login */}
         <small className="block mt-6 text-muted-foreground">
           Don't have an account?{" "}
-          <a className="text-primary hover:underline" href="/login">
-            Login
+          <a className="text-primary hover:underline" href="/Sign-up">
+            Sign-up
           </a>
         </small>
       </div>

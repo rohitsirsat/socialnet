@@ -73,7 +73,7 @@ const Signup = () => {
         <small className="block mt-6 text-muted-foreground">
           Already have an account?{" "}
           <a className="text-primary hover:underline" href="/sign-in">
-            Login
+            Sign-in
           </a>
         </small>
       </div>

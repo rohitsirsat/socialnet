@@ -7,12 +7,16 @@ import {
   User,
   PenSquare,
   Palette,
+  LogOut,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import { ModeToggle } from "@/Theme/ModeToggle";
+import { useAuth } from "@/context/AuthContext";
 
 const NavMenu = () => {
+  const { logout } = useAuth();
+
   return (
     <>
       {/* Sidebar (hidden on mobile) */}
@@ -42,25 +46,24 @@ const NavMenu = () => {
               <Search className="mr-2 h-8 w-8" />
               Explore
             </Button>
-            <Link to="messages">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-foreground"
-              >
-                <Mail className="mr-2 h-8 w-8" />
-                Messages
-              </Button>
-            </Link>
 
-            <Link to="/profile">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-foreground"
-              >
-                <User className="mr-2 h-8 w-8" />
-                Profile
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-foreground"
+            >
+              <Mail className="mr-2 h-8 w-8" />
+              Messages
+            </Button>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-foreground"
+              onClick={logout}
+            >
+              <LogOut className="mr-2 h-8 w-8" />
+              Logout
+            </Button>
+
             <Button className=" bg-primary text-primary-foreground hover:bg-primary-foreground">
               Tweet
             </Button>
