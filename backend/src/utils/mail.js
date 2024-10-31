@@ -1,5 +1,6 @@
 import Mailgen from "mailgen";
 import nodemailer from "nodemailer";
+import logger from "../logger/winston.logger.js";
 
 /**
  * @param {{email: string; subject: string; mailgenContent: Mailgen.Content}} options
@@ -31,7 +32,7 @@ const sendEmail = async (options) => {
   });
 
   const mail = {
-    from: "mail.freeapi@gmail.com", // We can name this anything. The mail will go to your Mailtrap inbox
+    from: "mail.socialnet@gmail.com", // We can name this anything. The mail will go to your Mailtrap inbox
 
     to: options.email, // receiver's mail
     subject: options.subject, // mail subject
@@ -44,10 +45,10 @@ const sendEmail = async (options) => {
   } catch (error) {
     // As sending email is not strongly coupled to the business logic it is not worth to raise an error when email sending fails
     // So it's better to fail silently rather than breaking the app
-    console.log(
+    logger.error(
       "Email service failed silently. Make sure you have provided your MAILTRAP credentials in the .env file"
     );
-    console.log("Error: ", error);
+    logger.error("Error: ", error);
   }
 };
 

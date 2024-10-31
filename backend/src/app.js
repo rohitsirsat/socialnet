@@ -45,11 +45,11 @@ import socialProfileRouter from "./routes/profile.routes.js";
 
 app.use("/api/v1/users", userRouter);
 
-app.use("/api/v1/social-media/profile", socialProfileRouter);
-app.use("/api/v1/social-media/follow", socialFollowRouter);
-app.use("/api/v1/social-media/posts", socialPostRouter);
-app.use("/api/v1/social-media/like", socialLikeRouter);
-app.use("/api/v1/social-media/bookmarks", socialBookmarkRouter);
-app.use("/api/v1/social-media/comments", socialCommentRouter);
+app.use("/api/v1/profile", socialProfileRouter);
+app.use("/api/v1/follow", socialFollowRouter);
+app.use("/api/v1/posts", socialPostRouter);
+app.use("/api/v1/like", socialLikeRouter);
+app.use("/api/v1/bookmarks", socialBookmarkRouter);
+app.use("/api/v1/comments", socialCommentRouter);
 
 export { app };

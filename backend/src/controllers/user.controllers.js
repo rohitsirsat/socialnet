@@ -120,10 +120,10 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(
       400,
       "You have previously registered using " +
-        user.loginType?.toLocaleLowerCase() +
-        "please use the " +
-        user.loginType?.toLocaleLowerCase() +
-        "login option to access your account"
+        user.loginType?.toLowerCase() +
+        ". Please use the " +
+        user.loginType?.toLowerCase() +
+        " login option to access your account."
     );
   }
 
