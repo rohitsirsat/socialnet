@@ -1,6 +1,9 @@
 import Mailgen from "mailgen";
 import nodemailer from "nodemailer";
 import logger from "../logger/winston.logger.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 /**
  * @param {{email: string; subject: string; mailgenContent: Mailgen.Content}} options
@@ -11,8 +14,8 @@ const sendEmail = async (options) => {
   const mailGenerator = new Mailgen({
     theme: "default",
     product: {
-      name: "FreeAPI",
-      link: "https://freeapi.app",
+      name: "SocialNet",
+      link: "https://socialnet.com",
     },
   });
 
@@ -23,16 +26,17 @@ const sendEmail = async (options) => {
   const emailHtml = mailGenerator.generate(options.mailgenContent);
 
   const transporter = nodemailer.createTransport({
-    host: process.env.MAILTRAP_SMTP_HOST,
-    port: process.env.MAILTRAP_SMTP_PORT,
+    service: "gmail",
+    secure: true,
+    port: 465,
     auth: {
-      user: process.env.MAILTRAP_SMTP_USER,
-      pass: process.env.MAILTRAP_SMTP_PASS,
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASS,
     },
   });
 
   const mail = {
-    from: "mail.socialnet@gmail.com", // We can name this anything. The mail will go to your Mailtrap inbox
+    from: "netsocial034@gmail.com", // We can name this anything. The mail will go to your Mailtrap inbox
 
     to: options.email, // receiver's mail
     subject: options.subject, // mail subject
@@ -48,7 +52,7 @@ const sendEmail = async (options) => {
     logger.error(
       "Email service failed silently. Make sure you have provided your MAILTRAP credentials in the .env file"
     );
-    logger.error("Error: ", error);
+    logger.error("Error: ", error.message);
   }
 };
 
