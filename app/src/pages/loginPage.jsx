@@ -29,7 +29,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     setIsLoading(true);
     await apiClient
       .post("/users/login", { username, password })
@@ -38,8 +38,8 @@ export default function Login() {
           const { data } = res;
           setUser(data.user);
           setToken(data.accessToken);
-          LocalStorage.set("user", data.user);
-          LocalStorage.set("token", data.accessToken);
+          LocalStorage.set("user", data.data.user);
+          LocalStorage.set("token", data.data.accessToken);
           toast({
             title: "Login Successful",
             description: res.data.message || "You have successfully logged in.",
@@ -64,9 +64,11 @@ export default function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-        SocialNet
-      </h1>
+      <Link to="/">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+          SocialNet
+        </h1>
+      </Link>
       <Card className="w-full max-w-md border-gray-700">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -115,7 +117,7 @@ export default function Login() {
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            onClick={handleRegister}
+            onClick={handleLogin}
           >
             {isLoading ? (
               <FiLoader className="mr-2 h-4 w-4 animate-spin" />

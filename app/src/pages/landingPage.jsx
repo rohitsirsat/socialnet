@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/footer";
 import ThemeToggleButton from "@/theme/themeToggle";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { FiLoader } from "react-icons/fi";
 
 export default function LandingPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <ParticleBackground />
@@ -19,7 +23,7 @@ export default function LandingPage() {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-primary">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
             SocialNet
           </h1>
           <h2 className="text-2xl md:text-4xl font-semibold mb-4">
@@ -40,7 +44,15 @@ export default function LandingPage() {
             <p className="text-xl mb-8 text-muted-foreground">
               Already have an account...?
             </p>
-            <Button>Sign up</Button>
+            <Link to={"/signup"}>
+              <Button>
+                {isLoading ? (
+                  <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Sign up"
+                )}
+              </Button>
+            </Link>
           </div>
         </motion.div>
 
