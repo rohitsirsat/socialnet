@@ -1,10 +1,70 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
-import { BookMarked, Home, User, PenSquare, LogOut } from "lucide-react";
+import {
+  BookMarked,
+  Home,
+  User,
+  PenSquare,
+  LogOut,
+  Loader2,
+  MoreHorizontal,
+} from "lucide-react";
 import MiniProfileSet from "./miniProfileSet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import ThemeToggleButton from "@/theme/themeToggle";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { apiClient } from "@/api";
+import { LocalStorage } from "@/utils";
 
 export default function Sidebar() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState("");
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    await apiClient
+      .post("/users/logout")
+      .then((res) => {
+        if (res.status >= 200 && res.status < 300) {
+          const { data } = res;
+          setUser(null);
+          setToken(null);
+          LocalStorage.clear();
+
+          toast({
+            title: "Logout Successful",
+            description:
+              res.data.message || "You have successfully logged out.",
+            variant: "success",
+          });
+          setIsLoading(false);
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        toast({
+          title: "Logout Failed",
+          description:
+            err.response?.data?.message ||
+            "Failed to logout. Please try again.",
+          variant: "destructive",
+        });
+
+        setIsLoading(false);
+      });
+  };
+
   return (
     <>
       <div className="hidden sm:block h-full pl-4 pt-1">
@@ -98,6 +158,32 @@ export default function Sidebar() {
                   <PenSquare />
                 </Button>
               </NavLink>
+            </li>
+            <li className="absolute bottom-6 border-2 rounded-full">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-400 bg-background text-foreground"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="flex flex-col">
+                  <DropdownMenuItem>
+                    <ThemeToggleButton />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <LogOut className="mr-2 h-4 w-4" />
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </li>
           </ul>
         </nav>
