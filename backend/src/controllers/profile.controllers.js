@@ -82,6 +82,7 @@ const getUserSocialProfile = async (userId, req) => {
   ]);
 
   let isFollowing = false;
+  let ownIt = false;
 
   if (req.user?._id && req.user?._id?.toString() !== userId.toString()) {
     // Check if there is a logged in user and logged in user is NOT same as the profile that is being loaded
@@ -93,12 +94,16 @@ const getUserSocialProfile = async (userId, req) => {
     isFollowing = followInstance ? true : false;
   }
 
+  if (req.user?._id && req.user?._id?.toString() === userId.toString()) {
+    ownIt = true;
+  }
+
   const userProfile = profile[0];
 
   if (!userProfile) {
     throw new ApiError(404, "User profile does not exist");
   }
-  return { ...userProfile, isFollowing };
+  return { ...userProfile, isFollowing, ownIt };
 };
 
 const getMySocialProfile = asyncHandler(async (req, res) => {
