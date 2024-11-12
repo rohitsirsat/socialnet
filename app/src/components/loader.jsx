@@ -1,7 +1,7 @@
 const Loader = () => {
   return (
-    <div className="flex items-center justify-center w-full h-screen fixed inset-0 bg-black z-50">
-      <div className="relative">
+    <div className="flex items-center justify-center h-screen dark:bg-black">
+      <div>
         <svg
           className="animate-spin h-10 w-8 text-blue-500"
           viewBox="0 0 24 24"
