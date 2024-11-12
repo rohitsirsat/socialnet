@@ -120,7 +120,10 @@ export default function Login() {
             onClick={handleLogin}
           >
             {isLoading ? (
-              <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+              <>
+                <FiLoader className="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+              </>
             ) : (
               "Login"
             )}
