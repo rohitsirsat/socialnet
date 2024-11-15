@@ -42,7 +42,7 @@ export default function LandingPage() {
         >
           <div className="flex flex-col items-center gap-1">
             <p className="text-xl mb-8 text-muted-foreground">
-              Already have an account...?
+              Don't have an account...?
             </p>
             <Link to={"/signup"}>
               <Button>
