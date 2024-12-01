@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,47 +12,26 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
-import { FiLoader } from "react-icons/fi";
-
-import { apiClient } from "@/api";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Signup() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const { register } = useAuth();
 
-  const handleRegister = async () => {
-    setIsLoading(true);
-    await apiClient
-      .post("/users/register", { username, email, password })
-      .then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          toast({
-            title: "Signup Successful",
-            description: res.data.message || "You have successfully signed up.",
-            variant: "success",
-          });
-          setIsLoading(false);
-          navigate("/check-email-to-verify");
-        }
-      })
-      .catch((err) => {
-        toast({
-          title: "Signup Failed",
-          description:
-            err.response?.data?.message ||
-            "User with this email or username already exists.",
-          variant: "destructive",
-        });
-
-        setIsLoading(false);
-      });
+  const handleDataChange = (name) => (e) => {
+    setData({
+      ...data,
+      [name]: e.target.value,
+    });
   };
+
+  // Handle user registration
+  const handleRegister = async () => await register(data);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -79,8 +58,8 @@ export default function Signup() {
                 <Input
                   id="username"
                   placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={data.username}
+                  onChange={handleDataChange("username")}
                   className="pl-10"
                 />
               </div>
@@ -95,8 +74,8 @@ export default function Signup() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={data.email}
+                  onChange={handleDataChange("email")}
                   className="pl-10"
                 />
               </div>
@@ -111,8 +90,8 @@ export default function Signup() {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={data.password}
+                  onChange={handleDataChange("password")}
                   className="pl-10"
                 />
               </div>
@@ -126,14 +105,7 @@ export default function Signup() {
             onClick={handleRegister}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </>
-            ) : (
-              "Sign Up"
-            )}
+            Sign Up
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}

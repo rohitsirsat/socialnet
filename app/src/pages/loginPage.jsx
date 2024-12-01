@@ -12,55 +12,24 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { FaUser, FaLock } from "react-icons/fa";
-import { FiLoader } from "react-icons/fi";
-import { LocalStorage } from "@/utils";
-
-import { apiClient } from "@/api";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState("");
-  const [user, setUser] = useState(null);
+  const [data, setData] = useState({
+    username: "",
+    password: "",
+  });
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const { login } = useAuth();
 
-  const handleLogin = async () => {
-    setIsLoading(true);
-    await apiClient
-      .post("/users/login", { username, password })
-      .then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          const { data } = res;
-          setUser(data.user);
-          setToken(data.accessToken);
-          LocalStorage.set("user", data.data.user);
-          LocalStorage.set("token", data.data.accessToken);
-          toast({
-            title: "Login Successful",
-            description: res.data.message || "You have successfully logged in.",
-            variant: "success",
-          });
-          setIsLoading(false);
-          navigate("/home");
-        }
-      })
-      .catch((err) => {
-        toast({
-          title: "Login Failed",
-          description:
-            err.response?.data?.message ||
-            "User with this email or username already exists.",
-          variant: "destructive",
-        });
-
-        setIsLoading(false);
-      });
+  const handleDataChange = (name) => (e) => {
+    setData({
+      ...data,
+      [name]: e.target.value,
+    });
   };
+
+  const handleLogin = async () => await login(data);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -89,8 +58,8 @@ export default function Login() {
                 <Input
                   id="username"
                   placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={data.username}
+                  onChange={handleDataChange("username")}
                   className="pl-10"
                 />
               </div>
@@ -105,8 +74,8 @@ export default function Login() {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={data.password}
+                  onChange={handleDataChange("password")}
                   className="pl-10"
                 />
               </div>
@@ -119,14 +88,7 @@ export default function Login() {
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleLogin}
           >
-            {isLoading ? (
-              <>
-                <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </>
-            ) : (
-              "Login"
-            )}
+            Login
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Don't have an account?{" "}
