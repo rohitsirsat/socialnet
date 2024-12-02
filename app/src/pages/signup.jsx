@@ -33,6 +33,8 @@ export default function Signup() {
   // Handle user registration
   const handleRegister = async () => await register(data);
 
+  const isFormValid = Object.values(data).every((value) => value !== "");
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
@@ -61,6 +63,7 @@ export default function Signup() {
                   value={data.username}
                   onChange={handleDataChange("username")}
                   className="pl-10"
+                  required
                 />
               </div>
             </div>
@@ -77,6 +80,7 @@ export default function Signup() {
                   value={data.email}
                   onChange={handleDataChange("email")}
                   className="pl-10"
+                  required
                 />
               </div>
             </div>
@@ -93,6 +97,7 @@ export default function Signup() {
                   value={data.password}
                   onChange={handleDataChange("password")}
                   className="pl-10"
+                  required
                 />
               </div>
             </div>
@@ -103,7 +108,7 @@ export default function Signup() {
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleRegister}
-            disabled={isLoading}
+            disabled={!isFormValid}
           >
             Sign Up
           </Button>

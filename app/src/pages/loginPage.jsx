@@ -31,6 +31,8 @@ export default function Login() {
 
   const handleLogin = async () => await login(data);
 
+  const isFormValid = Object.values(data).every((value) => value !== "");
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <Link to="/">
@@ -87,6 +89,7 @@ export default function Login() {
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleLogin}
+            disabled={!isFormValid}
           >
             Login
           </Button>
