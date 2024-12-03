@@ -8,11 +8,11 @@ import { requestHandler } from "@/utils";
 
 // Create a context to manage authentication-related data and functions
 
-const AuthContext = createContext({
+export const AuthContext = createContext({
   user: null,
   token: null,
-  register: async (data) => {},
-  login: async (data) => {},
+  register: async () => {},
+  login: async () => {},
   logout: async () => {},
 });
 
@@ -125,4 +125,4 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-export { AuthProvider, useAuth, AuthContext };
+export { AuthProvider, useAuth };
