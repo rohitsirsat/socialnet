@@ -8,63 +8,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, LogOut, Loader2 } from "lucide-react";
 import ThemeToggleButton from "@/theme/themeToggle";
-import { apiClient } from "@/api";
-import { useState } from "react";
-import { LocalStorage } from "@/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/Auth/AuthContext";
 
 export default function MiniProfileSet() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
+  const { logout, user } = useAuth();
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const username = user?.username;
 
-  const handleLogout = async () => {
-    setIsLoading(true);
-    await apiClient
-      .post("/users/logout")
-      .then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          const { data } = res;
-          setUser(null);
-          setToken(null);
-          LocalStorage.clear();
-
-          toast({
-            title: "Logout Successful",
-            description:
-              res.data.message || "You have successfully logged out.",
-            variant: "success",
-          });
-          setIsLoading(false);
-          navigate("/login");
-        }
-      })
-      .catch((err) => {
-        toast({
-          title: "Logout Failed",
-          description:
-            err.response?.data?.message ||
-            "Failed to logout. Please try again.",
-          variant: "destructive",
-        });
-
-        setIsLoading(false);
-      });
-  };
+  const handleLogout = async () => await logout();
 
   return (
     <div className="flex items-center justify-between sm:gap-3 p-4 bg-background text-foreground border rounded-full">
       <div className="flex items-center gap-1">
         <Avatar>
           <AvatarImage alt="User avatar" src="/placeholder.svg" />
-          <AvatarFallback>RS</AvatarFallback>
+          <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <span className="text-sm text-gray-500">@rohit_12g</span>
+          <span className="text-sm text-gray-500">
+            @{username ? username : ""}
+          </span>
         </div>
       </div>
       <DropdownMenu>
@@ -83,11 +46,7 @@ export default function MiniProfileSet() {
             <ThemeToggleButton />
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="mr-2 h-4 w-4" />
-            )}
+            <LogOut className="mr-2 h-4 w-4" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
