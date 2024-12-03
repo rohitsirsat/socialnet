@@ -12,7 +12,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/Auth/AuthContext";
 
 export default function Signup() {
   const [data, setData] = useState({
