@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/api";
 import { useToast } from "@/hooks/use-toast";
-import { FiLoader } from "react-icons/fi";
+import { FiLoader, FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const AvatarUpload = ({ isOpen = true, onClose }) => {
@@ -46,7 +46,7 @@ const AvatarUpload = ({ isOpen = true, onClose }) => {
       setIsLoading(true);
 
       // API request to upload the avatar
-      const response = await apiClient.patch("/users/avatar", formData);
+      await apiClient.patch("/users/avatar", formData);
       toast({
         title: "Avatar Updated",
         description: "Your avatar has been updated successfully.",
@@ -68,18 +68,47 @@ const AvatarUpload = ({ isOpen = true, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="w-full max-w-sm p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
         <DialogHeader>
-          <DialogTitle>Upload Avatar</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            Upload Avatar
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
+            Select an image file to update your avatar.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="file-input"
-          />
-          <Button type="submit" disabled={isLoading}>
+
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+          {/* File Input */}
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6">
+            <label
+              htmlFor="avatar-upload"
+              className="cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              {avatar ? (
+                <span>{avatar.name}</span>
+              ) : (
+                <>
+                  <FiUpload className="mb-2 h-6 w-6 text-gray-400 dark:text-gray-600" />
+                  Click to select an image
+                </>
+              )}
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400"
+          >
             {isLoading ? (
               <>
                 <FiLoader className="mr-2 h-4 w-4 animate-spin" />
@@ -91,7 +120,6 @@ const AvatarUpload = ({ isOpen = true, onClose }) => {
           </Button>
         </form>
       </DialogContent>
-      <DialogDescription>Upload your avatar</DialogDescription>
     </Dialog>
   );
 };

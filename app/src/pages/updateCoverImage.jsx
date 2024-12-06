@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/api";
 import { useToast } from "@/hooks/use-toast";
-import { FiLoader } from "react-icons/fi";
+import { FiLoader, FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const CoverUpload = ({ isOpen = true, onClose }) => {
@@ -46,10 +46,10 @@ const CoverUpload = ({ isOpen = true, onClose }) => {
       setIsLoading(true);
 
       // API request to upload the avatar
-      const response = await apiClient.patch("/profile/cover-image", formData);
+      await apiClient.patch("/profile/cover-image", formData);
       toast({
-        title: "cover image Updated",
-        description: "Your avatar has been updated successfully.",
+        title: "Cover Image Updated",
+        description: "Your cover image has been updated successfully.",
         variant: "success",
       });
       navigate("/profile");
@@ -68,30 +68,58 @@ const CoverUpload = ({ isOpen = true, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
         <DialogHeader>
-          <DialogTitle>Upload Cover Image</DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            Upload Cover Image
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
+            Select and upload an image to update your cover photo.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="file-input"
-          />
-          <Button type="submit" disabled={isLoading}>
+
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+          {/* File Input */}
+          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              {coverImage ? (
+                <span>{coverImage.name}</span>
+              ) : (
+                <>
+                  <FiUpload className="mb-2 h-6 w-6 text-gray-400 dark:text-gray-600" />
+                  Click to select an image
+                </>
+              )}
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400"
+          >
             {isLoading ? (
               <>
                 <FiLoader className="mr-2 h-4 w-4 animate-spin" />
                 Uploading...
               </>
             ) : (
-              "Update Avatar"
+              "Update Cover"
             )}
           </Button>
         </form>
       </DialogContent>
-      <DialogDescription>Upload your avatar</DialogDescription>
     </Dialog>
   );
 };

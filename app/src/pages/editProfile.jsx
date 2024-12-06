@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/select";
 import { apiClient } from "@/api";
 import { useToast } from "@/hooks/use-toast";
-import { FiLoader } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 const EditProfile = ({ isOpen = true, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -133,52 +134,61 @@ const EditProfile = ({ isOpen = true, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Complete Your Profile</DialogTitle>
-          <DialogDescription>
-            Please provide some additional information to complete your profile.
+      <DialogContent className="max-w-lg bg-background rounded-lg shadow-xl">
+        <DialogHeader className="border-b border-border pb-4">
+          <DialogTitle className="text-2xl font-bold">
+            Edit Your Profile
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground text-sm mt-1">
+            Provide additional information to complete your profile.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="firstName" className="text-right">
-                First Name
-              </Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
-              />
+        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+          <motion.div
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium">
+                  First Name
+                </Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="text-sm font-medium">
+                  Last Name
+                </Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  className="w-full"
+                  required
+                />
+              </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="lastName" className="text-right">
-                Last Name
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber" className="text-sm font-medium">
+                Phone Number
               </Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="phoneNumber" className="text-right">
-                Phone
-              </Label>
-              <div className="col-span-3 flex gap-2">
+              <div className="flex gap-2">
                 <Select
                   onValueChange={handleSelectChange}
                   value={formData.countryCode}
                 >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Country Code" />
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Code" />
                   </SelectTrigger>
                   <SelectContent>
                     {countryCodes.map((country) => (
@@ -198,8 +208,8 @@ const EditProfile = ({ isOpen = true, onClose }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="bio" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="bio" className="text-sm font-medium">
                 Bio
               </Label>
               <Textarea
@@ -207,44 +217,59 @@ const EditProfile = ({ isOpen = true, onClose }) => {
                 name="bio"
                 value={formData.bio}
                 onChange={handleInputChange}
-                className="col-span-3"
+                className="w-full"
                 rows={3}
+                placeholder="Tell us a bit about yourself..."
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="dob" className="text-right">
-                Date of Birth
-              </Label>
-              <Input
-                id="dob"
-                name="dob"
-                type="date"
-                value={formData.dob}
-                onChange={handleInputChange}
-                className="col-span-3"
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="dob" className="text-sm font-medium">
+                  Date of Birth
+                </Label>
+                <Input
+                  id="dob"
+                  name="dob"
+                  type="date"
+                  value={formData.dob}
+                  onChange={handleInputChange}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-sm font-medium">
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  className="w-full"
+                  placeholder="City, Country"
+                />
+              </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Location
-              </Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex justify-between items-center">
-            <Button type="submit">
-              {" "}
+          </motion.div>
+          <DialogFooter className="flex justify-end gap-4 pt-4 border-t border-border">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={onClose}
+              className="hover:bg-accent hover:text-accent-foreground"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
-                  <FiLoader className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
                 </>
               ) : (
                 "Update Profile"
