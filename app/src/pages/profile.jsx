@@ -35,7 +35,7 @@ const ImagePreview = ({ src, alt, onClose }) => (
         />
       </div>
     </DialogContent>
-    <DialogDescription>Click the preview</DialogDescription>
+    <DialogDescription>Preview</DialogDescription>
   </Dialog>
 );
 
@@ -43,6 +43,7 @@ export default function Profile() {
   const [profileData, setProfileData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const getitt = async () => {
@@ -65,7 +66,7 @@ export default function Profile() {
     getitt();
   }, []);
 
-  if (isLoading)
+  if (!profileData || !profileData.firstName || !profileData.lastName)
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader />
@@ -78,19 +79,47 @@ export default function Profile() {
         <Link to="/home" className="hover:bg-gray-800 rounded-full p-2">
           <ArrowLeft />
         </Link>
-        <h1 className="text-xl font-bold">
-          {" "}
-          {profileData?.firstName + " " + profileData?.lastName}
-        </h1>
+
+        <div className="flex items-center justify-between w-full">
+          <h1 className="text-xl font-bold">
+            {" "}
+            {(profileData &&
+              profileData?.firstName + " " + profileData?.lastName) ||
+              ""}
+          </h1>
+          {profileData?.account?._id === profileData?.owner ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-400 bg-background text-foreground"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="flex flex-col">
+                <DropdownMenuItem>
+                  <Link to={"/update-avatar"}>change avatar</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link to={"/update-cover-image"}>change cover image</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
       <ScrollArea className="h-screen m-0">
         <div className="max-w-2xl mx-auto pb-16">
           <div className="relative">
             <img
               src={
-                profileData?.coverImage?.url
-                  ? profileData?.coverImage?.url
-                  : "/placeholder.svg?height=200&width=600"
+                (profileData && profileData?.coverImage?.url) ||
+                "/placeholder.svg?height=200&width=600"
               }
               alt="Cover"
               width={600}
@@ -127,31 +156,9 @@ export default function Profile() {
             <div className="absolute top-52 right-4">
               {profileData?.account?._id === profileData?.owner ? (
                 <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 bg-background text-foreground"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="flex flex-col">
-                      <DropdownMenuItem>
-                        <Link to={"/update-avatar"}>change avatar</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Link to={"/update-cover-image"}>
-                          change cover image
-                        </Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button variant="outline">
-                    <Link to={"/edit-profile"}>Edit profile</Link>
-                  </Button>
+                  <Link to={"/edit-profile"}>
+                    <Button variant="outline">Edit Profile</Button>
+                  </Link>
                 </div>
               ) : (
                 <Button variant="outline">
@@ -168,7 +175,7 @@ export default function Profile() {
                 </h1>
                 <p className="text-gray-500">
                   {profileData?.account?.username
-                    ? profileData?.account?.username
+                    ? "@" + profileData?.account?.username
                     : "add username"}
                 </p>
               </div>
