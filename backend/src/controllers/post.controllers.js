@@ -382,6 +382,9 @@ const getMyPosts = asyncHandler(async (req, res) => {
         author: new mongoose.Types.ObjectId(req.user?._id),
       },
     },
+    {
+      $sort: { createdAt: -1 },
+    },
     ...postCommonAggregation(req),
   ]);
 
