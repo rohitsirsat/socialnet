@@ -46,24 +46,23 @@ export const requestHandler = async (
   onSuccess: (data: SocialNetSuccessResponseInterface) => void,
   onError: (error: string) => void
 ) => {
-  // Show loading state if setLoading function is provided
   setLoading && setLoading(true);
   try {
-    // Make the API request
     const response = await api();
     const { data } = response;
     if (data.success) {
       onSuccess(data);
     }
   } catch (error: any) {
-    // Handle error cases, including unauthorized and forbidden cases
-    if ([401, 403].includes(error?.response.data?.statusCode)) {
-      localStorage.clear(); // Clear local storage on authentication issues
-      if (isBrowser) window.location.href = "/login"; // Redirect to login page
+    if ([401, 403].includes(error?.response?.status)) {
+      // Clear auth data and redirect to login
+      LocalStorage.clear();
+      if (isBrowser) {
+        window.location.href = "/login";
+      }
     }
     onError(error?.response?.data?.message || "Something went wrong");
   } finally {
-    // Hide loading state if setLoading function is provided
     setLoading && setLoading(false);
   }
 };
