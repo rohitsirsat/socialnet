@@ -21,7 +21,7 @@ export default function MiniProfileSet() {
     <div className="flex items-center justify-between sm:gap-3 p-4 bg-background text-foreground border rounded-full">
       <div className="flex items-center gap-1">
         <Avatar>
-          <AvatarImage alt="User avatar" src="/placeholder.svg" />
+          <AvatarImage className="object-cover" src={user?.avatar.url} />
           <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
