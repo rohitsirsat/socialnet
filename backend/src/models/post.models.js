@@ -27,3 +27,9 @@ const postSchema = new Schema(
 
 postSchema.plugin(mongooseAggregatePaginate);
 export const SocialPost = mongoose.model("SocialPost", postSchema);
+
+/**
+ * @description (Tags)
+ * This field stores hashtags or keywords associated with the post. It allows users to categorize their posts with relevant tags, making it easier to search for related content.
+
+ */
