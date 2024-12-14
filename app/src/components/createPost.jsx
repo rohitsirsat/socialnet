@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,9 +16,15 @@ import EmojiPicker from "emoji-picker-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/api";
+import { usePost } from "@/context/Post/PostContext";
 
-export default function CreatePost() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function CreatePost({
+  isEdit = false,
+  post = null,
+  isOpen,
+  onClose,
+  trigger,
+}) {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [images, setImages] = useState([]);
@@ -27,6 +33,16 @@ export default function CreatePost() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { toast } = useToast();
+  const { fetchPosts } = usePost();
+
+  // if isEdit is true, then set the content to the post content
+  useEffect(() => {
+    if (isEdit && post) {
+      setContent(post.content);
+      setTags(post.tags || []);
+      setImages(post.images || []);
+    }
+  }, [isEdit, post]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,34 +57,44 @@ export default function CreatePost() {
     });
 
     images.forEach((image) => {
-      formData.append("images", image); // Must match 'name' in upload.fields
+      // if image is a file, then append it to the formData
+      if (image instanceof File) {
+        formData.append("images", image); // Must match 'name' in upload.fields
+      }
     });
 
-    await apiClient
-      .post("/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Ensure the correct content type
-        },
-      })
-      .then((res) => {
+    try {
+      if (isEdit) {
+        await apiClient.patch(`/posts/${post._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast({
+          title: "Post updated successfully",
+          description: "Your post has been updated.",
+        });
+      } else {
+        await apiClient.post("/posts", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         toast({
           title: "Post created successfully",
-          description:
-            res.data.message || "Your post has been created successfully",
+          description: "Your post has been created.",
         });
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        toast({
-          title: "Post creation failed",
-          description:
-            err.response?.data?.message ||
-            "Failed to create post. Please try again.",
-        });
-        setIsLoading(false);
+      }
+
+      // Reset form and refresh posts
+      resetForm();
+      onClose();
+      fetchPosts(1); // Refresh posts from first page
+    } catch (err) {
+      toast({
+        title: isEdit ? "Failed to update post" : "Failed to create post",
+        description: err.response?.data?.message || "Please try again.",
+        variant: "destructive",
       });
-    setIsOpen(false);
-    resetForm();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAddTag = () => {
@@ -84,12 +110,28 @@ export default function CreatePost() {
 
   const handleImageUpload = (e) => {
     if (e.target.files) {
-      setImages([...images, ...Array.from(e.target.files)]);
+      const newFiles = Array.from(e.target.files);
+      setImages((prevImages) => [...prevImages, ...newFiles]);
     }
   };
 
   const handleRemoveImage = (indexToRemove) => {
-    setImages(images.filter((_, index) => index !== indexToRemove));
+    if (isEdit && images[indexToRemove]._id) {
+      // If it's an existing image, then we need to remove it from the formData
+      apiClient
+        .patch(`/posts/remove/image/${post._id}/${images[indexToRemove]._id}`)
+        .then(setImages(images.filter((_, index) => index !== indexToRemove)))
+        .catch((err) => {
+          toast({
+            title: "Failed to remove image",
+            description: err.response?.data?.message || "Please try again.",
+            variant: "destructive",
+          });
+        });
+    } else {
+      // For new images or create mode
+      setImages(images.filter((_, index) => index !== indexToRemove));
+    }
   };
 
   const resetForm = () => {
@@ -97,6 +139,7 @@ export default function CreatePost() {
     setTags([]);
     setImages([]);
     setCurrentTag("");
+    setShowEmojiPicker(false);
   };
 
   const handleEmojiClick = (emojiObject) => {
@@ -105,15 +148,11 @@ export default function CreatePost() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-9/12 text-white font-bold py-6 rounded-full text-lg">
-          Post
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create a new post</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Post" : "Create Post"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-start space-x-4">
@@ -159,7 +198,11 @@ export default function CreatePost() {
             {images.map((image, index) => (
               <div key={index} className="relative">
                 <img
-                  src={URL.createObjectURL(image)}
+                  src={
+                    image instanceof File
+                      ? URL.createObjectURL(image)
+                      : image.url
+                  }
                   alt={`Uploaded ${index + 1}`}
                   className="w-full h-24 object-cover rounded"
                 />
