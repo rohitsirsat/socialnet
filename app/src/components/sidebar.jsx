@@ -1,13 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   BookMarked,
   Home,
   User,
   PenSquare,
   LogOut,
-  Loader2,
   MoreHorizontal,
 } from "lucide-react";
 import MiniProfileSet from "./miniProfileSet";
@@ -18,52 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import ThemeToggleButton from "@/theme/themeToggle";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { apiClient } from "@/api";
-import { LocalStorage } from "@/utils";
+import CreatePost from "./createPost";
+import { useAuth } from "@/context/Auth/AuthContext";
 
 export default function Sidebar() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { logout } = useAuth();
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogout = async () => {
-    setIsLoading(true);
-    await apiClient
-      .post("/users/logout")
-      .then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          const { data } = res;
-          setUser(null);
-          setToken(null);
-          LocalStorage.clear();
-
-          toast({
-            title: "Logout Successful",
-            description:
-              res.data.message || "You have successfully logged out.",
-            variant: "success",
-          });
-          setIsLoading(false);
-          navigate("/login");
-        }
-      })
-      .catch((err) => {
-        toast({
-          title: "Logout Failed",
-          description:
-            err.response?.data?.message ||
-            "Failed to logout. Please try again.",
-          variant: "destructive",
-        });
-
-        setIsLoading(false);
-      });
-  };
+  const handleLogout = async () => await logout();
 
   return (
     <>
@@ -106,26 +67,29 @@ export default function Sidebar() {
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="/profile"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-2xl font-bold inline-block p-1 rounded-lg"
-                    : "inline-block p-1 rounded-lg hover:bg-accent hover:text-accent-foreground"
-                }
-              >
-                <div className="flex items-center gap-4 py-2">
-                  <User />
-                  <p className="text-xl">Profile</p>
-                </div>
-              </NavLink>
+              <div>
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-2xl font-bold inline-block p-1 rounded-lg"
+                      : "inline-block p-1 rounded-lg hover:bg-accent hover:text-accent-foreground"
+                  }
+                >
+                  <div className="flex items-center gap-4 py-2">
+                    <User />
+                    <p className="text-xl">Profile</p>
+                  </div>
+                </NavLink>
+              </div>
             </li>
             <li>
-              <NavLink to="/post">
-                <Button className="w-9/12 text-foreground font-bold py-6 rounded-full text-lg">
-                  Post
-                </Button>
-              </NavLink>
+              <Button
+                className="w-9/12 text-white font-bold py-6 rounded-full text-lg"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                Post
+              </Button>
             </li>
           </ul>
           <div className="absolute bottom-6">
@@ -133,6 +97,12 @@ export default function Sidebar() {
           </div>
         </nav>
       </div>
+
+      <CreatePost
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+      />
+
       {/* // Mobile sidebar */}
       <div className="sm:hidden pt-4">
         <nav>
@@ -153,11 +123,12 @@ export default function Sidebar() {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/post"}>
-                <Button className="text-foreground font-bold py-6 rounded-full text-4xl">
-                  <PenSquare />
-                </Button>
-              </NavLink>
+              <Button
+                className="text-foreground font-bold py-6 rounded-full text-4xl"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <PenSquare />
+              </Button>
             </li>
             <li className="absolute bottom-6 border-2 rounded-full">
               <DropdownMenu>
@@ -176,11 +147,7 @@ export default function Sidebar() {
                     <ThemeToggleButton />
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
-                    {isLoading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <LogOut className="mr-2 h-4 w-4" />
-                    )}
+                    <LogOut className="mr-2 h-4 w-4" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
