@@ -1,13 +1,12 @@
 // Import necessary libraries and types
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { LocalStorage } from "@/utils";
+import { useAuth } from "@/context/Auth/AuthContext";
 
 // Define the PublicRoute component which takes in children as its prop
 const PublicRoute = ({ children }) => {
-  // Get the token and user ID from local storage
-  const token = LocalStorage.get("token");
-  const user = LocalStorage.get("user");
+  // Get the token and user ID
+  const { token, user } = useAuth();
 
   // If there is a valid token and user ID, navigate the user to the home page
   if (token && user?._id) return <Navigate to="/home" replace />;
