@@ -218,7 +218,13 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, { isEmailVerified: true }, "Email is verified"));
+    .json(
+      new ApiResponse(
+        200,
+        { isEmailVerified: true },
+        "Email is verified go ahead to login"
+      )
+    );
 });
 
 // This controller is called when user is logged in and he has snackbar that your email is not verified
@@ -492,6 +498,30 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, updatedUser, "Avatar updated successfully"));
 });
 
+// Add this to your existing user.controllers.js
+
+const searchUsers = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No search query provided"));
+  }
+
+  const users = await User.find({
+    $or: [
+      { username: { $regex: query, $options: "i" } },
+      { firstName: { $regex: query, $options: "i" } },
+      { lastName: { $regex: query, $options: "i" } },
+    ],
+  }).select("username firstName lastName avatar");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, users, "Users fetched successfully"));
+});
+
 export {
   assignRole,
   changeCurrentPassword,
@@ -506,4 +536,5 @@ export {
   resetForgottenPassword,
   updateUserAvatar,
   verifyEmail,
+  searchUsers,
 };
