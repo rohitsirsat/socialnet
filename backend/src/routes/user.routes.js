@@ -14,6 +14,7 @@ import {
   resetForgottenPassword,
   updateUserAvatar,
   verifyEmail,
+  searchUsers,
 } from "../controllers/user.controllers.js";
 import {
   verifyJWT,
@@ -55,6 +56,8 @@ router
 
 // Secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
+
+router.route("/search").get(verifyJWT, searchUsers);
 
 router
   .route("/avatar")
