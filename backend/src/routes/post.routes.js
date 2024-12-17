@@ -10,6 +10,7 @@ import {
   getPostsByUsername,
   removePostImage,
   updatePost,
+  getBookMarkedPosts,
 } from "../controllers/post.controllers.js";
 import {
   verifyJWT,
@@ -41,6 +42,8 @@ router
   );
 
 router.route("/get/my").get(verifyJWT, getMyPosts);
+
+router.route("/get/my/bookmarked").get(verifyJWT, getBookMarkedPosts);
 
 router
   .route("/get/u/:username")

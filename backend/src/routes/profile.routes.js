@@ -25,7 +25,7 @@ router.route("/u/:username").get(
   validate,
   getProfileByUserName
 );
-
+//
 router.use(verifyJWT);
 
 router
