@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import LandingPage from "./pages/landingPage";
 import Login from "./pages/loginPage";
 import Signup from "./pages/signup";
@@ -8,18 +8,21 @@ import Profile from "./pages/profile";
 import Bookmarks from "./pages/bookmarks";
 import PrivateRoute from "./components/privateRoute";
 import PublicRoute from "./components/publicRoute";
-import { LocalStorage } from "./utils";
 import Layout from "./layout";
+import EditProfile from "./pages/editProfile";
+import AvatarUpload from "@/pages/updateAvatar";
+import CoverUpload from "./pages/updateCoverImage";
+import CreatePost from "./components/createPost";
+import { useAuth } from "./context/Auth/AuthContext";
 
 function App() {
-  const token = LocalStorage.get("token");
-  const user = LocalStorage.get("user");
+  const { user, token } = useAuth();
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
         {/* Root route: Redirects to home if the user is logged in, else to the login page */}
+        <Route path="/" element={<LandingPage />} />
         <Route
           path="/"
           element={
@@ -48,14 +51,6 @@ function App() {
             </PublicRoute>
           }
         />
-        {/* <Route
-          path={`http://localhost:8080/api/v1/users/verify-email/:verificationToken`}
-          element={
-            <PublicRoute>
-              <VerifyEmail />
-            </PublicRoute>
-          }
-        /> */}
         <Route
           path="/check-email-to-verify"
           element={
@@ -83,6 +78,14 @@ function App() {
             }
           />
           <Route
+            path="/profile/:username" // Add this new route
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/bookmarks"
             element={
               <PrivateRoute>
@@ -91,6 +94,30 @@ function App() {
             }
           />
         </Route>
+        <Route
+          path="/edit-profile"
+          element={
+            <PrivateRoute>
+              <EditProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/update-avatar"
+          element={
+            <PrivateRoute>
+              <AvatarUpload />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/update-cover-image"
+          element={
+            <PrivateRoute>
+              <CoverUpload />
+            </PrivateRoute>
+          }
+        />
         {/* Wildcard route for undefined paths. Shows a 404 error */}
         <Route path="*" element={<p>404 Not found</p>} />
       </Routes>
