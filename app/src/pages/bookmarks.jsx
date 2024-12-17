@@ -62,6 +62,12 @@ function Bookmarks() {
           </div>
         )}
       </div>
+
+      {!isLoading && bookmarkedPosts.length === 0 && (
+        <div className="flex items-center justify-center mt-5">
+          <p>No posts available</p>
+        </div>
+      )}
     </ScrollArea>
   );
 }
