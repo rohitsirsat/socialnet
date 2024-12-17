@@ -311,7 +311,10 @@ const removePostImage = asyncHandler(async (req, res) => {
 
 const getAllPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
-  const postAggregation = SocialPost.aggregate([...postCommonAggregation(req)]);
+  const postAggregation = SocialPost.aggregate([
+    { $sort: { createdAt: -1 } },
+    ...postCommonAggregation(req),
+  ]);
 
   const posts = await SocialPost.aggregatePaginate(
     postAggregation,
@@ -420,18 +423,104 @@ const getBookMarkedPosts = asyncHandler(async (req, res) => {
         localField: "postId",
         foreignField: "_id",
         as: "post",
-        pipeline: postCommonAggregation(req), // after lookup we need to structure the posts same as other post apis
+      },
+    },
+    {
+      $unwind: "$post",
+    },
+    {
+      $lookup: {
+        from: "socialcomments",
+        localField: "post._id",
+        foreignField: "postId",
+        as: "comments",
+      },
+    },
+    {
+      $lookup: {
+        from: "sociallikes",
+        localField: "post._id",
+        foreignField: "postId",
+        as: "likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "sociallikes",
+        localField: "post._id",
+        foreignField: "postId",
+        as: "isLiked",
+        pipeline: [
+          {
+            $match: {
+              likedBy: new mongoose.Types.ObjectId(req.user?._id),
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "socialbookmarks",
+        localField: "post._id",
+        foreignField: "postId",
+        as: "isBookmarked",
+        pipeline: [
+          {
+            $match: {
+              bookmarkedBy: new mongoose.Types.ObjectId(req.user?._id),
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "socialprofiles",
+        localField: "post.author",
+        foreignField: "owner",
+        as: "author",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "account",
+              pipeline: [
+                {
+                  $project: {
+                    avatar: 1,
+                    email: 1,
+                    username: 1,
+                  },
+                },
+              ],
+            },
+          },
+          { $addFields: { account: { $first: "$account" } } },
+        ],
       },
     },
     {
       $addFields: {
-        post: { $first: "$post" },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        post: 1,
+        "post.author": { $first: "$author" },
+        "post.likes": { $size: "$likes" },
+        "post.comments": { $size: "$comments" },
+        "post.isLiked": {
+          $cond: {
+            if: { $gte: [{ $size: "$isLiked" }, 1] },
+            then: true,
+            else: false,
+          },
+        },
+        "post.isBookmarked": {
+          $cond: {
+            if: { $gte: [{ $size: "$isBookmarked" }, 1] },
+            then: true,
+            else: false,
+          },
+        },
       },
     },
     {
