@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/Auth/AuthContext";
 import dayjs from "dayjs";
-import { Link } from "react-router-dom";
-import { getMyProfile } from "@/api";
+import { Link, useParams } from "react-router-dom";
+import { getMyProfile, followUnFollowUser } from "@/api";
 import { requestHandler } from "@/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarDays, MapPin, MoreHorizontal, ArrowLeft } from "lucide-react";
+import {
+  CalendarDays,
+  MapPin,
+  MoreHorizontal,
+  ArrowLeft,
+  Loader2,
+} from "lucide-react";
 import Loader from "@/components/loader";
 import {
   DropdownMenu,
@@ -19,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import MyPosts from "@/components/myPost";
+import { MyPosts } from "@/components/myPost";
 
 const ImagePreview = ({ src, alt, onClose }) => (
   <Dialog open onOpenChange={onClose}>
@@ -40,42 +47,70 @@ const ImagePreview = ({ src, alt, onClose }) => (
 );
 
 export default function Profile() {
-  const [profileData, setProfileData] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoadingFollow, setIsLoadingFollow] = useState(false);
+
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
-    const getitt = async () => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
       await requestHandler(
         async () => await getMyProfile(),
-        setIsLoading,
+        null,
         (res) => {
           const { data } = res;
           setProfileData(data);
+          setIsFollowing(data?.isFollowing || false);
         },
         (error) => {
-          tost({
-            title: error?.response?.data?.message || "Not found",
-            variant: "destructive",
-          });
-          setIsLoading(false);
+          console.log(error);
         }
       );
+      setIsLoading(false);
     };
-    getitt();
+    fetchProfile();
   }, []);
 
-  if (!profileData || !profileData.firstName || !profileData.lastName)
+  const handleFollowUnfollow = async () => {
+    try {
+      setIsLoadingFollow(true);
+      const response = await followUnFollowUser(profileData?.account?._id);
+      setIsFollowing(response.data.data.following);
+    } catch (error) {
+      console.error("Follow/Unfollow error:", error);
+    } finally {
+      setIsLoadingFollow(false);
+    }
+  };
+
+  console.log("Curretn user id: ", currentUser?._id);
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader />
+      <div className="h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading profile...</p>
+        </div>
       </div>
     );
+  }
+
+  if (!profileData && !isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Failed to load profile</p>
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="abspolute top-0 left-0 right-0 flex items-center gap-x-6 p-2 cursor-pointer bg-transparent">
+      <div className="abspolute top-0 left-0 right-0 flex items-center gap-x-6 p-2 cursor-pointer bg-transparent bg-black">
         <Link to="/home" className="hover:bg-gray-800 rounded-full p-2">
           <ArrowLeft />
         </Link>
@@ -113,7 +148,7 @@ export default function Profile() {
           )}
         </div>
       </div>
-      <ScrollArea className="h-screen m-0">
+      <ScrollArea className="h-screen">
         <div className="max-w-2xl mx-auto pb-16">
           <div className="relative">
             <img
@@ -140,7 +175,7 @@ export default function Profile() {
                     ? profileData?.account?.avatar?.url
                     : "/placeholder-user.jpg"
                 }
-                alt="profile image"
+                alt="Avatar"
                 width={120}
                 height={120}
                 className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 cursor-pointer object-cover"
@@ -154,15 +189,27 @@ export default function Profile() {
               />
             </div>
             <div className="absolute top-52 right-4">
-              {profileData?.account?._id === profileData?.owner ? (
+              {currentUser?._id === profileData?.account?._id ? (
+                // Show Edit Profile button for own profile
                 <div>
-                  <Link to={"/edit-profile"}>
+                  <Link to="/edit-profile">
                     <Button variant="outline">Edit Profile</Button>
                   </Link>
                 </div>
               ) : (
-                <Button variant="outline">
-                  {profileData?.isFollowing ? "Following" : "Follow"}
+                // Show Follow/Unfollow button for other profiles
+                <Button
+                  variant="outline"
+                  onClick={handleFollowUnfollow}
+                  disabled={isLoadingFollow}
+                >
+                  {isLoadingFollow ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  ) : isFollowing ? (
+                    "Following"
+                  ) : (
+                    "Follow"
+                  )}
                 </Button>
               )}
             </div>
@@ -229,7 +276,7 @@ export default function Profile() {
                 <div className="text-center corsor-pointer h-1 bg-blue-500 w-14 rounf"></div>
               </div>
             </nav>
-            <div className="mt-2">
+            <div className="mt-2 pr-2">
               <MyPosts />
             </div>
           </div>
